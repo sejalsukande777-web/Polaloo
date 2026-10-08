@@ -17,6 +17,7 @@ export default function ExportPanel() {
       showDate: state.showDate,
       backgroundId: state.stripBackground,
       photoCrops: state.photoCrops,
+      pixelSize: state.pixelSize,
     })
   }
 

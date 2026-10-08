@@ -130,16 +130,18 @@ function posterMode(levels) {
 }
 
 const PIXEL_MODES = {
-  pixel: { cols: 72, map: posterMode(10) },
-  candy: { cols: 64, map: rampMode(RAMPS.candy, 0.22) },
-  gameboy: { cols: 60, map: rampMode(RAMPS.gameboy, 0.2) },
-  arcade: { cols: 72, map: cubeMode(4, 44) },
-  bitmap: { cols: 80, map: rampMode(RAMPS.bitmap, 0.5) },
+  pixel: { cols: 72, map: posterMode(12) },
+  candy: { cols: 64, map: rampMode(RAMPS.candy, 0.1) },
+  gameboy: { cols: 60, map: rampMode(RAMPS.gameboy, 0.1) },
+  arcade: { cols: 72, map: cubeMode(6, 12) },
+  bitmap: { cols: 80, map: rampMode(RAMPS.bitmap, 0.3) },
 }
+// "Pixel size" setting: multiplies the number of pixels across the photo.
+export const PIXEL_SIZES = { fine: 1.5, medium: 1, chunky: 0.6 }
 
-function pixelate(imageData, mode, colsOverride) {
+function pixelate(imageData, mode, colsOverride, scale = 1) {
   const { width: w, height: h, data: d } = imageData
-  const cols = Math.min(colsOverride || mode.cols, w)
+  const cols = Math.max(8, Math.min(Math.round((colsOverride || mode.cols) * scale), w))
   const cell = w / cols
   const rows = Math.max(1, Math.round(h / cell))
   const cw = w / cols, ch = h / rows
@@ -165,6 +167,15 @@ function pixelate(imageData, mode, colsOverride) {
       lums.push(grayscaleValue(px[0], px[1], px[2]))
     }
   }
+  // light sharpen on the pixel grid (keeps eyes, mouth and edges readable)
+  const sharp = cells.map((px, k) => {
+    const r = Math.floor(k / cols), c = k % cols
+    const n = [cells[Math.max(0, r - 1) * cols + c], cells[Math.min(rows - 1, r + 1) * cols + c], cells[r * cols + Math.max(0, c - 1)], cells[r * cols + Math.min(cols - 1, c + 1)]]
+    return px.map((v, q) => v + 0.6 * (v - (n[0][q] + n[1][q] + n[2][q] + n[3][q]) / 4))
+  })
+  for (let k = 0; k < cells.length; k++) cells[k] = sharp[k]
+  lums.length = 0
+  cells.forEach((px) => lums.push(grayscaleValue(px[0], px[1], px[2])))
   // gentle auto-contrast so flat/dim photos still pop
   lums.sort((a, b) => a - b)
   const lo = lums[Math.floor(lums.length * 0.02)], hi = lums[Math.floor(lums.length * 0.98)]
@@ -191,7 +202,7 @@ export function applyFilterToCanvas(ctx, width, height, filterId, opts = {}) {
   if (filterId === 'original') return
   const imageData = ctx.getImageData(0, 0, width, height)
   if (PIXEL_MODES[filterId]) {
-    pixelate(imageData, PIXEL_MODES[filterId], opts.cols)
+    pixelate(imageData, PIXEL_MODES[filterId], opts.cols, PIXEL_SIZES[opts.size] || 1)
   } else {
     (filterFns[filterId] || filterFns.original)(imageData)
   }

@@ -9,6 +9,7 @@ import StickerCanvas from './StickerCanvas.jsx'
 
 function PhotoSlotCanvas({ src, filterId, slot, crop }) {
   const canvasRef = useRef(null)
+  const { pixelSize } = useBoothState()
 
   useEffect(() => {
     if (!src) return
@@ -27,10 +28,10 @@ function PhotoSlotCanvas({ src, filterId, slot, crop }) {
       const dstRatio = cssW / cssH
       const { sx, sy, sw, sh } = computeCoverCrop(img.width, img.height, dstRatio, crop?.zoom, crop?.panX, crop?.panY)
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cssW, cssH)
-      applyFilterToCanvas(ctx, canvas.width, canvas.height, filterId)
+      applyFilterToCanvas(ctx, canvas.width, canvas.height, filterId, { size: pixelSize })
     }
     img.src = src
-  }, [src, filterId, crop?.zoom, crop?.panX, crop?.panY])
+  }, [src, filterId, pixelSize, crop?.zoom, crop?.panX, crop?.panY])
 
   return (
     <div

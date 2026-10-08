@@ -20,6 +20,7 @@ export async function composePhotoStrip({
   filters,
   stickers = [],
   showDate = false,
+  pixelSize = 'medium',
   backgroundId = 'cream',
   photoCrops = [],
 }) {
@@ -49,7 +50,7 @@ export async function composePhotoStrip({
     const crop = photoCrops[i] || DEFAULT_CROP
     const { sx, sy, sw, sh } = computeCoverCrop(img.width, img.height, dw / dh, crop.zoom, crop.panX, crop.panY)
     offCtx.drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh)
-    applyFilterToCanvas(offCtx, dw, dh, filters?.[i] || 'original')
+    applyFilterToCanvas(offCtx, dw, dh, filters?.[i] || 'original', { size: pixelSize })
 
     ctx.drawImage(off, dx, dy)
   }

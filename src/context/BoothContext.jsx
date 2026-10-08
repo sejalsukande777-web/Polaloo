@@ -5,6 +5,7 @@ const initialState = {
   screen: 'home',
   photos: [null, null, null, null],
   photoFilters: ['original', 'original', 'original', 'original'],
+  pixelSize: 'medium',
   photoCrops: [{ ...DEFAULT_CROP }, { ...DEFAULT_CROP }, { ...DEFAULT_CROP }, { ...DEFAULT_CROP }],
   stickers: [],
   showDate: false,
@@ -40,6 +41,8 @@ function reducer(state, action) {
       photoFilters[action.index] = action.filterId
       return { ...state, photoFilters }
     }
+    case 'SET_PIXEL_SIZE':
+      return { ...state, pixelSize: action.size }
     case 'SET_FILTER_ALL':
       return { ...state, photoFilters: state.photoFilters.map(() => action.filterId) }
     case 'ADD_STICKER':

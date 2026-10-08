@@ -5,6 +5,7 @@ import { useBoothState, useBoothDispatch } from '../context/BoothContext.jsx'
 
 function FilterSwatch({ photoSrc, filterId, label, active, onClick }) {
   const canvasRef = useRef(null)
+  const { pixelSize } = useBoothState()
 
   useEffect(() => {
     if (!photoSrc) return
@@ -33,10 +34,10 @@ function FilterSwatch({ photoSrc, filterId, label, active, onClick }) {
         sy = (img.height - sh) / 2
       }
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size)
-      applyFilterToCanvas(ctx, canvas.width, canvas.height, filterId, { cols: 28 })
+      applyFilterToCanvas(ctx, canvas.width, canvas.height, filterId, { cols: 44, size: pixelSize })
     }
     img.src = photoSrc
-  }, [photoSrc, filterId])
+  }, [photoSrc, filterId, pixelSize])
 
   return (
     <button className={`filter-swatch ${active ? 'active' : ''}`} onClick={onClick}>
@@ -84,6 +85,14 @@ export default function FilterPanel({ activePhotoIndex }) {
       {[['classic', 'Classic'], ['pixel', 'Pixel']].map(([group, title]) => (
         <div key={group}>
           <div className="filter-group-title">{title}</div>
+          {group === 'pixel' && (
+            <div className="pixel-size-row">
+              <span>Pixel size</span>
+              {[['fine', 'Fine'], ['medium', 'Medium'], ['chunky', 'Chunky']].map(([id, label]) => (
+                <button key={id} className={state.pixelSize === id ? 'active' : ''} onClick={() => dispatch({ type: 'SET_PIXEL_SIZE', size: id })}>{label}</button>
+              ))}
+            </div>
+          )}
           <div className="filter-swatch-row">
             {filterLibrary.filter((f) => f.group === group).map((f) => (
               <FilterSwatch
