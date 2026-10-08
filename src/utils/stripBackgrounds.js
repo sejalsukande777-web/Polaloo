@@ -18,6 +18,33 @@ const rnd = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294
 const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 const STAR = ['..X..', '.XXX.', 'XXXXX', '.XXX.', '..X..']
 const HEART = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...']
+
+const ring = (c, cx, cy, r, col) => { for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const d = Math.hypot(x, y); if (d <= r + 0.3 && d >= r - 1.2) R(c, col, cx + x, cy + y, 1, 1) } }
+const spritePal = (c, rows, ox, oy, pal) => rows.forEach((r, y) => [...r].forEach((ch, x) => { if (pal[ch]) R(c, pal[ch], ox + x, oy + y, 1, 1) }))
+const DAISY = ['..W..', '.WWW.', 'WWOWW', '.WWW.', '..W..']
+const BERRY = ['.GGGGG.', '.RRGRR.', 'RRRRRRR', 'RYRRYRR', 'RRRYRRR', '.RYRRR.', '..RRR..', '...R...']
+
+// A big-eyed pixel girl peeking up from the footer (cropped by the strip's bottom edge).
+function girl(c, cx, o = {}) {
+  const { hair = '#1a1226', hi = '#4a3d6e', skin = '#ffe0cf', iris = '#6b3a1f', glasses = null, bun = false, flower = false } = o
+  const y0 = 313
+  if (bun) { blob(c, cx + 13, y0 + 3, 7, 6, hair); R(c, hi, cx + 10, y0, 4, 1) }
+  blob(c, cx, y0 + 12, 23, 13, hair); R(c, hair, cx - 23, y0 + 12, 46, 48)
+  blob(c, cx, y0 + 30, 17, 17, skin); R(c, skin, cx - 17, y0 + 30, 34, 30)
+  const bang = [5, 7, 8, 7, 6, 8, 9, 8, 6, 7, 6, 4]
+  bang.forEach((n, i) => R(c, hair, cx - 18 + i * 3, y0 + 10, 3, n + 4))
+  R(c, hi, cx - 14, y0 + 4, 9, 1); R(c, hi, cx + 2, y0 + 5, 7, 1); R(c, hi, cx - 21, y0 + 20, 1, 12); R(c, hi, cx + 20, y0 + 22, 1, 10)
+  const eye = (ex, ey, left) => {
+    blob(c, ex, ey, 4, 5, '#ffffff'); blob(c, ex, ey + 1, 3, 4, iris)
+    R(c, '#1a1226', ex - 1, ey, 3, 3); R(c, '#ffffff', ex - 2, ey - 2, 2, 2); R(c, '#ffffff', ex + 1, ey + 2, 1, 1)
+    R(c, '#1a1226', ex - 5, ey - 5, 11, 1); R(c, '#1a1226', left ? ex - 6 : ex + 6, ey - 6, 1, 2)
+  }
+  eye(cx - 10, y0 + 29, true); eye(cx + 10, y0 + 29, false)
+  blob(c, cx - 15, y0 + 37, 3, 2, '#ffb3bd'); blob(c, cx + 15, y0 + 37, 3, 2, '#ffb3bd')
+  R(c, '#e8a898', cx, y0 + 37, 1, 1); R(c, '#c4605a', cx - 2, y0 + 43, 5, 1); R(c, '#c4605a', cx - 1, y0 + 44, 3, 1)
+  if (glasses) { ring(c, cx - 10, y0 + 29, 7, glasses); ring(c, cx + 10, y0 + 29, 7, glasses); R(c, glasses, cx - 3, y0 + 28, 7, 1) }
+  if (flower) { [[0, -1], [-1, 0], [1, 0], [0, 1]].forEach(([dx, dy]) => R(c, '#ff9ec7', cx - 19 + dx * 2, y0 + 9 + dy * 2, 2, 2)); R(c, '#ffe58f', cx - 19, y0 + 9, 2, 2) }
+}
 const solid = (col) => (c) => { R(c, col, 0, 0, ART_W, ART_H); plates(c, '#fffdf8') }
 const dots = (base, dot, plate, dark) => ({ render: (c) => { paint(c, (x, y) => ((x % 8 < 2 && y % 8 < 2) || ((x + 4) % 8 < 2 && (y + 4) % 8 < 2) ? dot : base)); plates(c, plate) }, dark })
 const tile = (rowsFn, base, plate) => (c) => { R(c, base, 0, 0, ART_W, ART_H); for (let y = 0; y < ART_H; y += 16) for (let x = 0; x < ART_W; x += 16) rowsFn(c, x, y); plates(c, plate) }
@@ -56,6 +83,50 @@ export const backgroundOptions = [
       paint(c, (x, y) => (y >= 306 ? gr[Math.min(2, Math.floor((y - 306) / 18))] : null))
       for (let i = 0; i < 70; i++) R(c, ['#ffd23f', '#ff7fa8', '#fff6e8'][i % 3], Math.floor(r() * 118), 308 + Math.floor(r() * 50), 1, 1)
       plates(c, '#fffdf6')
+    } },
+  { id: 'butter', label: 'Butter Girl', dateAlign: 'left', render: (c) => {
+      R(c, '#fff0a6', 0, 0, ART_W, ART_H)
+      for (let y = 0; y < ART_H; y += 16) for (let x = 0; x < ART_W; x += 16) { spritePal(c, DAISY, x + 1, y + 1, { W: '#fffdf8', O: '#ff9e6b' }); R(c, '#ffb3c6', x + 11, y + 10, 2, 2) }
+      plates(c, '#fffdf8'); girl(c, 84, { hair: '#7a4a2a', hi: '#a06a40', flower: true })
+    } },
+  { id: 'lilac', label: 'Lilac Lace', dateAlign: 'left', render: (c) => {
+      R(c, '#e9defe', 0, 0, ART_W, ART_H)
+      for (let y = 4; y < ART_H; y += 12) for (let x = (y / 12) % 2 ? 2 : 8; x < ART_W; x += 12) R(c, '#fffdf8', x, y, 2, 2)
+      R(c, '#5d4a86', 0, 0, ART_W, 6); for (let x = 3; x < ART_W; x += 6) blob(c, x, 6, 3, 3, '#5d4a86'); for (let x = 3; x < ART_W; x += 6) R(c, '#e9defe', x, 2, 1, 1)
+      plates(c, '#fffdf8'); girl(c, 84, { hair: '#1a1226', iris: '#3a6b4a' })
+    } },
+  { id: 'bluebell', label: 'Bluebell', dateAlign: 'right', render: (c) => {
+      R(c, '#bcc8f4', 0, 0, ART_W, ART_H); R(c, '#fff3b0', 0, 304, ART_W, 56)
+      for (let y = 4; y < 300; y += 8) { R(c, '#fffdf8', 4, y, 2, 2); R(c, '#fffdf8', 114, y, 2, 2) }
+      plates(c, '#fffdf8'); girl(c, 36, { hair: '#5a3a24', hi: '#8a5a3a', flower: true, iris: '#5a3a24' })
+    } },
+  { id: 'noirgirl', label: 'Night Girl', dark: true, dateAlign: 'left', render: (c) => {
+      paint(c, (x, y) => ((x % 8 < 2 && y % 8 < 2) || ((x + 4) % 8 < 2 && (y + 4) % 8 < 2) ? '#fff6e9' : '#1a1226'))
+      for (let i = 0; i < 18; i++) R(c, '#ffb3c6', 120 - i, 342 + (i >> 1), i, 1)
+      plates(c, '#fff6e9'); girl(c, 84, { hair: '#2b2140', hi: '#6a5a96', glasses: '#d63a4a', iris: '#4a2a18' })
+    } },
+  { id: 'cherrygirl', label: 'Cherry Girl', dark: true, dateAlign: 'right', render: (c) => {
+      R(c, '#8a1022', 0, 0, ART_W, ART_H)
+      for (let y = 3; y < ART_H; y += 6) for (let x = (y / 6) % 2 ? 1 : 4; x < ART_W; x += 6) R(c, '#fff3ee', x, y, 1, 1)
+      plates(c, '#fff3ee'); girl(c, 36, { hair: '#4a2a18', hi: '#7a4a2a', bun: true, iris: '#4a2a18' })
+    } },
+  { id: 'cowpink', label: 'Cow Print', render: (c) => {
+      R(c, '#e9a9bf', 0, 0, ART_W, ART_H); R(c, '#fffdf8', 0, 0, ART_W, 9)
+      const r = rnd(21); for (let i = 0; i < 9; i++) blob(c, 6 + i * 13 + Math.floor(r() * 4), 3 + Math.floor(r() * 4), 3 + Math.floor(r() * 3), 2 + Math.floor(r() * 2), '#1a1226')
+      R(c, '#f6c6d6', 0, 9, ART_W, 1); plates(c, '#fffdf8')
+    } },
+  { id: 'strawberry', label: 'Strawberry', render: tile((c, x, y) => { spritePal(c, BERRY, x + 1, y + 1, { G: '#4caf50', R: '#e8394f', Y: '#ffe58f' }); R(c, '#fffdf8', x + 11, y + 11, 2, 2); R(c, '#fffdf8', x + 5, y + 13, 1, 1) }, '#ffd6e4', '#fffdf8') },
+  { id: 'confetti', label: 'Confetti', render: (c) => {
+      R(c, '#fff8ec', 0, 0, ART_W, ART_H); const r = rnd(33), cols = ['#ffb3c6', '#ffe58f', '#b9e6ff', '#c9b6ff', '#a8efc8', '#ffc59a']
+      for (let i = 0; i < 110; i++) { const x = Math.floor(r() * 118), y = Math.floor(r() * 358); R(c, cols[i % 6], x, y, 1 + (i % 3 === 0 ? 1 : 0), 1 + (i % 3 === 0 ? 1 : 0)) }
+      for (let i = 0; i < 14; i++) { const x = 3 + Math.floor(r() * 112), y = 3 + Math.floor(r() * 352); R(c, '#ffd23f', x, y - 1, 1, 3); R(c, '#ffd23f', x - 1, y, 3, 1) }
+      plates(c, '#fffdf8')
+    } },
+  { id: 'sunset', label: 'Sunset', render: (c) => {
+      const g = ['#2b1d4a', '#5a3a8f', '#b04a9a', '#f0688a', '#ff9e6b', '#ffd37a'], r = rnd(4)
+      paint(c, (x, y) => { const p = (y / ART_H) * (g.length - 1), b = Math.floor(p); return g[b + 1 < g.length && p - b > B4[(y & 3) * 4 + (x & 3)] / 16 ? b + 1 : b] })
+      for (let i = 0; i < 40; i++) R(c, '#fffdf8', Math.floor(r() * 119), Math.floor(r() * 150), 1, 1)
+      plates(c, '#fffdf8')
     } },
   { id: 'pinkdots', label: 'Pink Dots', ...dots('#ff9fcf', '#fff6e9', '#fff6e9') },
   { id: 'blackdots', label: 'Black Dots', ...dots('#1a1226', '#fff6e9', '#fff6e9', true) },

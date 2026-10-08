@@ -78,9 +78,10 @@ export async function composePhotoStrip({
     await document.fonts.load('20px "Pixelify Sans"')
     ctx.fillStyle = background.dark ? '#fff6e9' : '#2b1d4a'
     ctx.font = `${Math.round(canvas.width * 0.04)}px "Pixelify Sans", monospace`
-    ctx.textAlign = 'center'
+    const al = background.dateAlign || 'center'
+    ctx.textAlign = al
     const dateStr = new Date().toLocaleDateString()
-    ctx.fillText(dateStr, canvas.width / 2, canvas.height - canvas.height * 0.035)
+    ctx.fillText(dateStr, al === 'left' ? canvas.width * 0.1 : al === 'right' ? canvas.width * 0.9 : canvas.width / 2, canvas.height - canvas.height * 0.035)
   }
 
   return canvas

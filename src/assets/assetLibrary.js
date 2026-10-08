@@ -125,10 +125,6 @@ export const stickerLibrary = {
     { id: 'lollipop', label: 'Lollipop', src: A(`${S}/food/lollipop.png`) },
   ],
   accessories: [
-    { id: 'crown', label: 'Crown', src: A(`${S}/accessories/crown.png`) },
-    { id: 'musical-note', label: 'Musical Note', src: A(`${S}/accessories/musical-note.png`) },
-    { id: 'button', label: 'Button', src: A(`${S}/accessories/button.png`) },
-    { id: 'key', label: 'Key', src: A(`${S}/accessories/key.png`) },
     { id: 'cat-ear-headphones', label: 'Cat Headphones', src: A(`${S}/accessories/cat-ear-headphones.png`) },
     { id: 'love-letter', label: 'Love Letter', src: A(`${S}/accessories/love-letter.png`) },
     { id: 'paw-print', label: 'Paw Print', src: A(`${S}/accessories/paw-print.png`) },

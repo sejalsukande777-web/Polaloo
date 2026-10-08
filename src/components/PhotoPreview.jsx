@@ -59,7 +59,7 @@ const PhotoPreview = forwardRef(function PhotoPreview({ photos, filters, showDat
         {frameLibrary.fourStripSlots.map((slot, i) => (
           <PhotoSlotCanvas key={i} src={photos[i]} filterId={filters[i]} slot={slot} crop={state.photoCrops?.[i] || DEFAULT_CROP} />
         ))}
-        {showDate && <div className="preview-date" style={{ color: bgOption.dark ? '#fff6e9' : '#2b1d4a' }}>{new Date().toLocaleDateString()}</div>}
+        {showDate && <div className="preview-date" style={{ color: bgOption.dark ? '#fff6e9' : '#2b1d4a', textAlign: bgOption.dateAlign || 'center', padding: '0 10%' }}>{new Date().toLocaleDateString()}</div>}
       </div>
       <StickerCanvas containerRef={ref} />
     </div>
