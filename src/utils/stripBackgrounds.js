@@ -16,7 +16,8 @@ const sprite = (c, rows, ox, oy, col, k = 1) => rows.forEach((r, y) => [...r].fo
 const blob = (c, cx, cy, rx, ry, col) => { for (let y = -ry; y <= ry; y++) for (let x = -rx; x <= rx; x++) if ((x / rx) ** 2 + (y / ry) ** 2 <= 1) R(c, col, cx + x, cy + y, 1, 1) }
 const rnd = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296)
 const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
-const STAR = ['..X..', '.XXX.', 'XXXXX', '.XXX.', '..X..']
+const STAR9 = ['....X....', '....X....', '...XXX...', 'XXXXXXXXX', '.XXXXXXX.', '..XXXXX..', '.XXX.XXX.', '.XX...XX.']
+const STAR5 = ['..X..', '.XXX.', 'XXXXX', '.XXX.', '.X.X.']
 const HEART = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...']
 
 const ring = (c, cx, cy, r, col) => { for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const d = Math.hypot(x, y); if (d <= r + 0.3 && d >= r - 1.2) R(c, col, cx + x, cy + y, 1, 1) } }
@@ -45,18 +46,33 @@ function girl(c, cx, o = {}) {
   if (glasses) { ring(c, cx - 10, y0 + 29, 7, glasses); ring(c, cx + 10, y0 + 29, 7, glasses); R(c, glasses, cx - 3, y0 + 28, 7, 1) }
   if (flower) { [[0, -1], [-1, 0], [1, 0], [0, 1]].forEach(([dx, dy]) => R(c, '#ff9ec7', cx - 19 + dx * 2, y0 + 9 + dy * 2, 2, 2)); R(c, '#ffe58f', cx - 19, y0 + 9, 2, 2) }
 }
+
+const BOW = ['XXX...XXX', 'XXXX.XXXX', 'XXXKKKXXX', 'XXXX.XXXX', 'XXX...XXX']
+// Gingham "picnic cloth" frames in pastel colours: stitched border, washi tape, bow, label card, daisies.
+const picnic = (id, label, [l, m, d], a, a2) => ({ id, label, render: (c) => {
+  paint(c, (x, y) => { const p = (x >> 2) & 1, q = (y >> 2) & 1; return p && q ? d : p || q ? m : l })
+  plates(c, '#fffdf8')
+  for (let y = 4; y < 356; y += 4) { R(c, a, 4, y, 1, 2); R(c, a, 115, y, 1, 2) }
+  for (let x = 8; x < 112; x += 4) { R(c, a, x, 4, 2, 1); R(c, a, x, 355, 2, 1) }
+  R(c, a2, 2, 1, 30, 7); for (let x = 4; x < 31; x += 4) R(c, '#ffffff', x, 3, 1, 3)
+  spritePal(c, BOW, 100, 1, { X: a, K: a2 })
+  R(c, '#fffdf8', 26, 316, 68, 18); R(c, a, 26, 316, 68, 1); R(c, a, 26, 333, 68, 1)
+  sprite(c, HEART, 33, 322, a); sprite(c, HEART, 80, 322, a); spritePal(c, DAISY, 57, 321, { W: a2, O: '#ffe27a' })
+  spritePal(c, DAISY, 8, 310, { W: '#fffdf8', O: a2 }); spritePal(c, DAISY, 107, 308, { W: '#fffdf8', O: a2 })
+  R(c, a2, 84, 346, 30, 7); for (let x = 86; x < 113; x += 4) R(c, '#ffffff', x, 348, 1, 3)
+} })
+const cowSpots = (c, col, seed, n) => { const r = rnd(seed); for (let i = 0; i < n; i++) { const x = Math.floor(r() * 120), y = Math.floor(r() * 360), k = 2 + Math.floor(r() * 3); blob(c, x, y, 3 + k, 1 + k, col); blob(c, x + k, y - 1, 2 + k, k + 1, col); blob(c, x - k, y + 1, k + 2, k, col) } }
 const solid = (col) => (c) => { R(c, col, 0, 0, ART_W, ART_H); plates(c, '#fffdf8') }
 const dots = (base, dot, plate, dark) => ({ render: (c) => { paint(c, (x, y) => ((x % 8 < 2 && y % 8 < 2) || ((x + 4) % 8 < 2 && (y + 4) % 8 < 2) ? dot : base)); plates(c, plate) }, dark })
 const tile = (rowsFn, base, plate) => (c) => { R(c, base, 0, 0, ART_W, ART_H); for (let y = 0; y < ART_H; y += 16) for (let x = 0; x < ART_W; x += 16) rowsFn(c, x, y); plates(c, plate) }
 
 export const backgroundOptions = [
-  { id: 'gingham', label: 'Picnic', render: (c) => {
-      paint(c, (x, y) => { const a = (x >> 2) & 1, b = (y >> 2) & 1; return a && b ? '#d9c8a4' : a || b ? '#ece1c9' : '#fbf6ea' })
-      plates(c, '#fffdf6')
-      R(c, '#e2d3b3', 2, 3, 30, 6); R(c, '#cdb98f', 2, 3, 30, 1)                                  // washi tape
-      blob(c, 105, 6, 4, 4, '#8a6a4a'); blob(c, 104, 5, 2, 2, '#a98763'); R(c, '#5a4030', 104, 5, 1, 1); R(c, '#5a4030', 106, 7, 1, 1) // button
-      R(c, '#cdb089', 30, 318, 60, 14); R(c, '#e0c7a1', 30, 318, 60, 1); sprite(c, HEART, 36, 322, '#c9806f'); R(c, '#e2d3b3', 84, 308, 28, 6)  // kraft label
-    } },
+  picnic('gingham', 'Picnic', ['#fbf6ea', '#ece1c9', '#d9c8a4'], '#c9a97a', '#e0c7a1'),
+  picnic('picnicpink', 'Picnic Pink', ['#fff1f6', '#ffd3e3', '#ffb0cd'], '#ff6fa5', '#ff9ec7'),
+  picnic('picnicmint', 'Picnic Mint', ['#f1fff8', '#cdf3e1', '#9fe3c4'], '#4fc79a', '#7fdcb9'),
+  picnic('picnicblue', 'Picnic Blue', ['#f1f8ff', '#cfe6fb', '#a3d0f4'], '#5aa9e6', '#8cc6f0'),
+  picnic('picniclilac', 'Picnic Lilac', ['#f7f3ff', '#e0d4fb', '#c8b4f4'], '#9a7bea', '#b9a1f2'),
+  picnic('picnicbutter', 'Picnic Butter', ['#fffbe6', '#fff0b0', '#ffe27a'], '#f2b01e', '#ffd04a'),
   { id: 'cherry', label: 'Cherry', dark: true, render: (c) => {
       R(c, '#7a1224', 0, 0, ART_W, ART_H); plates(c, '#fff3ee')
       const r = rnd(5)
@@ -64,7 +80,7 @@ export const backgroundOptions = [
         if (y < 316 + ((x * 5) % 7) + (x - 6) * 0.3) continue
         const a = ((x >> 1) & 1), b = ((y >> 1) & 1); R(c, a && b ? '#b3243b' : a || b ? '#e9b8bd' : '#fff3ee', x, y, 1, 1)
       }
-      sprite(c, STAR, 2, 168, '#fff3ee', 3); sprite(c, STAR, 5, 171, '#7a1224', 2); r()
+      r()
     } },
   { id: 'airmail', label: 'Airmail', render: (c) => {
       R(c, '#ead9b5', 0, 0, ART_W, ART_H)
@@ -110,11 +126,8 @@ export const backgroundOptions = [
       for (let y = 3; y < ART_H; y += 6) for (let x = (y / 6) % 2 ? 1 : 4; x < ART_W; x += 6) R(c, '#fff3ee', x, y, 1, 1)
       plates(c, '#fff3ee'); girl(c, 36, { hair: '#4a2a18', hi: '#7a4a2a', bun: true, iris: '#4a2a18' })
     } },
-  { id: 'cowpink', label: 'Cow Print', render: (c) => {
-      R(c, '#e9a9bf', 0, 0, ART_W, ART_H); R(c, '#fffdf8', 0, 0, ART_W, 9)
-      const r = rnd(21); for (let i = 0; i < 9; i++) blob(c, 6 + i * 13 + Math.floor(r() * 4), 3 + Math.floor(r() * 4), 3 + Math.floor(r() * 3), 2 + Math.floor(r() * 2), '#1a1226')
-      R(c, '#f6c6d6', 0, 9, ART_W, 1); plates(c, '#fffdf8')
-    } },
+  { id: 'cowpink', label: 'Cow Print', render: (c) => { R(c, '#fffdf8', 0, 0, ART_W, ART_H); cowSpots(c, '#1a1226', 7, 46); plates(c, '#ff9ec7', 3); plates(c, '#fffdf8', 2) } },
+  { id: 'pinkcow', label: 'Pink Cow', render: (c) => { R(c, '#ffe3ee', 0, 0, ART_W, ART_H); cowSpots(c, '#ff9ec7', 12, 46); plates(c, '#fffdf8', 2) } },
   { id: 'strawberry', label: 'Strawberry', render: tile((c, x, y) => { spritePal(c, BERRY, x + 1, y + 1, { G: '#4caf50', R: '#e8394f', Y: '#ffe58f' }); R(c, '#fffdf8', x + 11, y + 11, 2, 2); R(c, '#fffdf8', x + 5, y + 13, 1, 1) }, '#ffd6e4', '#fffdf8') },
   { id: 'confetti', label: 'Confetti', render: (c) => {
       R(c, '#fff8ec', 0, 0, ART_W, ART_H); const r = rnd(33), cols = ['#ffb3c6', '#ffe58f', '#b9e6ff', '#c9b6ff', '#a8efc8', '#ffc59a']
@@ -128,10 +141,14 @@ export const backgroundOptions = [
       for (let i = 0; i < 40; i++) R(c, '#fffdf8', Math.floor(r() * 119), Math.floor(r() * 150), 1, 1)
       plates(c, '#fffdf8')
     } },
-  { id: 'pinkdots', label: 'Pink Dots', ...dots('#ff9fcf', '#fff6e9', '#fff6e9') },
+  { id: 'pinkdots', label: 'Pink Pop', render: (c) => {
+      R(c, '#ffb6d5', 0, 0, ART_W, ART_H)
+      for (let j = 0; j < 31; j++) for (let k = 0; k < 11; k++) { const cx = 6 + k * 12 + (j % 2) * 6, cy = 4 + j * 12; blob(c, cx, cy, 3, 3, '#fffdf8'); R(c, '#ff6fa5', cx + 5, cy + 5, 2, 2) }
+      plates(c, '#fffdf8'); spritePal(c, BOW, 100, 1, { X: '#ff6fa5', K: '#d6579b' })
+    } },
   { id: 'blackdots', label: 'Black Dots', ...dots('#1a1226', '#fff6e9', '#fff6e9', true) },
   { id: 'hearts', label: 'Hearts', render: tile((c, x, y) => { sprite(c, HEART, x + 1, y + 1, '#ff7bb8'); sprite(c, HEART, x + 9, y + 9, '#fff6e9') }, '#ffc2de', '#fffdf8') },
-  { id: 'stars', label: 'Stars', dark: true, render: tile((c, x, y) => { sprite(c, STAR, x + 1, y + 1, '#ffe58f'); R(c, '#8fd3ff', x + 11, y + 4, 1, 1); R(c, '#8fd3ff', x + 6, y + 11, 1, 1) }, '#2b1d4a', '#fff6e9') },
+  { id: 'stars', label: 'Stars', dark: true, render: tile((c, x, y) => { sprite(c, STAR9, x + 1, y + 1, '#ffd23f'); R(c, '#fff3a8', x + 4, y + 3, 1, 3); sprite(c, STAR5, x + 11, y + 9, '#8fd3ff'); R(c, '#fffdf8', x + 5, y + 13, 1, 1); R(c, '#ff9ec7', x + 13, y + 3, 1, 1) }, '#2b1d4a', '#fff6e9') },
   { id: 'cream', label: 'Cream', render: solid('#fff6e9') },
   { id: 'blush', label: 'Bubblegum', render: solid('#ffc2de') },
   { id: 'mint', label: 'Mint', render: solid('#bff5de') },
