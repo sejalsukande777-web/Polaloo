@@ -62,6 +62,65 @@ const picnic = (id, label, [l, m, d], a, a2) => ({ id, label, render: (c) => {
   R(c, a2, 84, 346, 30, 7); for (let x = 86; x < 113; x += 4) R(c, '#ffffff', x, 348, 1, 3)
 } })
 const cowSpots = (c, col, seed, n) => { const r = rnd(seed); for (let i = 0; i < n; i++) { const x = Math.floor(r() * 120), y = Math.floor(r() * 360), k = 2 + Math.floor(r() * 3); blob(c, x, y, 3 + k, 1 + k, col); blob(c, x + k, y - 1, 2 + k, k + 1, col); blob(c, x - k, y + 1, k + 2, k, col) } }
+
+// ---- tiny 3x5 pixel font (for frame captions) ----
+const GLYPHS = { A:'010101111101101',B:'110101110101110',C:'011100100100011',D:'110101101101110',E:'111100110100111',F:'111100110100100',G:'011100101101011',H:'101101111101101',I:'111010010010111',J:'001001001101010',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'110101101101101',O:'010101101101010',P:'110101110100100',Q:'010101101111011',R:'110101110101101',S:'011100010001110',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010',Z:'111001010100111','1':'010110010010111','2':'110001010100111','3':'110001010001110','4':'101101111001001','!':'010010010000010','-':'000000111000000' }
+const textW = (t, k = 1) => (t.length * 4 - 1) * k
+const text = (c, t, x, y, col, k = 1) => [...t].forEach((ch, i) => { const g = GLYPHS[ch]; if (g) [...g].forEach((b, j) => { if (b === '1') R(c, col, x + (i * 4 + (j % 3)) * k, y + Math.floor(j / 3) * k, k, k) }) })
+
+// ---- shaped photo windows: the frame is drawn ON TOP of the photos with the window shape cut out ----
+function carve(c, mask, o1, o2) {
+  const S = slots()
+  const inside = (x, y) => S.some((s) => x >= s.x && x < s.x + s.w && y >= s.y && y < s.y + s.h && mask(x - s.x, y - s.y, s.w, s.h))
+  S.forEach((s) => { for (let y = s.y - 4; y < s.y + s.h + 4; y++) for (let x = s.x - 4; x < s.x + s.w + 4; x++) {
+    if (inside(x, y)) continue
+    let d = 9
+    for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) if (inside(x + dx, y + dy)) d = Math.min(d, Math.max(Math.abs(dx), Math.abs(dy)))
+    if (d <= 2) R(c, o1, x, y, 1, 1); else if (d === 3) R(c, o2, x, y, 1, 1)
+  } })
+  S.forEach((s) => { for (let y = s.y; y < s.y + s.h; y++) for (let x = s.x; x < s.x + s.w; x++) if (mask(x - s.x, y - s.y, s.w, s.h)) c.clearRect(x, y, 1, 1) })
+}
+const scallopMask = (x, y, w, h) => {
+  if (x >= 5 && x < w - 5 && y >= 5 && y < h - 5) return true
+  const bump = (cx, cy) => (x - cx) ** 2 + (y - cy) ** 2 <= 30
+  for (let k = 5; k < w - 4; k += 10) if (bump(k, 5) || bump(k, h - 6)) return true
+  for (let k = 5; k < h - 4; k += 10) if (bump(5, k) || bump(w - 6, k)) return true
+  return false
+}
+const heartMask = (x, y) => { const u = (x - 49.5) / 42.6, v = 1.25 - (y - 2) / 26.7; return (u * u + v * v - 1) ** 3 - u * u * v ** 3 <= 0 }
+const bubbleMask = (x, y, w, h) => {
+  const r = 9, dx = x - Math.min(Math.max(x, 3 + r), w - 4 - r), dy = y - Math.min(Math.max(y, 3 + r), h - 9 - r)
+  if (x >= 3 && x <= w - 4 && y >= 3 && y <= h - 9 && dx * dx + dy * dy <= r * r) return true
+  return y > h - 10 && y < h && x >= 10 && x <= 24 - (y - (h - 10)) * 2
+}
+const shaped = (id, label, base, mask, o1, o2, deco) => ({ id, label, shaped: true, render: (c) => { R(c, base, 0, 0, ART_W, ART_H); deco(c); carve(c, mask, o1, o2) } })
+
+// ---- retro computer-window frames: every photo gets a title bar ----
+const retro = (id, label, bg, bar, ink, accent) => ({ id, label, render: (c) => {
+  R(c, bg, 0, 0, ART_W, ART_H)
+  for (let x = 0; x < ART_W; x += 8) R(c, 'rgba(255,255,255,0.45)', x, 0, 1, ART_H)
+  for (let y = 0; y < ART_H; y += 8) R(c, 'rgba(255,255,255,0.45)', 0, y, ART_W, 1)
+  slots().forEach((s, i) => {
+    R(c, ink, s.x - 3, s.y - 9, s.w + 6, s.h + 11); R(c, bar, s.x - 2, s.y - 8, s.w + 4, 6); R(c, '#fffdf8', s.x - 2, s.y - 2, s.w + 4, s.h + 3)
+    text(c, 'PHOTO ' + (i + 1), s.x + 1, s.y - 7, ink); [0, 1, 2].forEach((k) => R(c, accent, s.x + s.w - 12 + k * 4, s.y - 6, 3, 3))
+  })
+  text(c, 'PIXEL BOOTH', 60 - Math.floor(textW('PIXEL BOOTH') / 2), 322, ink)
+} })
+
+// ---- big peeking eyes strip (burgundy glasses, star highlights) ----
+function bigEyes(c, x0, y0, w, h) {
+  R(c, '#ffd9c4', x0, y0, w, h)
+  for (let x = x0 + 2; x < x0 + w; x += 6) blob(c, x, y0 + 3, 4, 3, '#5a3320')
+  R(c, '#5a3320', 58, y0 + 4, 4, 3); blob(c, x0 + w - 10, y0 + 6, 3, 3, '#ff7fb0'); R(c, '#ffe58f', x0 + w - 11, y0 + 5, 2, 2)
+  const cy = y0 + 16
+  ;[34, 86].forEach((ex, i) => {
+    blob(c, ex, cy, 9, 8, '#ffffff'); blob(c, ex, cy + 1, 6, 6, '#5b2b1a'); blob(c, ex, cy + 1, 3, 3, '#1a1226')
+    R(c, '#ffe58f', ex + 1, cy - 3, 3, 1); R(c, '#ffe58f', ex + 2, cy - 4, 1, 3); R(c, '#ffffff', ex - 3, cy + 1, 1, 1)
+    R(c, '#2a1620', ex - 9, cy - 9, 19, 1); R(c, '#2a1620', i ? ex + 9 : ex - 10, cy - 10, 2, 1)
+    ring(c, ex, cy, 12, '#b0213a'); ring(c, ex, cy, 11, '#b0213a'); blob(c, ex - 6, cy + 10, 4, 2, '#ffa8a8')
+  })
+  R(c, '#b0213a', 46, cy - 3, 28, 2); R(c, '#e8a090', 60, cy + 6, 1, 1)
+}
 const solid = (col) => (c) => { R(c, col, 0, 0, ART_W, ART_H); plates(c, '#fffdf8') }
 const dots = (base, dot, plate, dark) => ({ render: (c) => { paint(c, (x, y) => ((x % 8 < 2 && y % 8 < 2) || ((x + 4) % 8 < 2 && (y + 4) % 8 < 2) ? dot : base)); plates(c, plate) }, dark })
 const tile = (rowsFn, base, plate) => (c) => { R(c, base, 0, 0, ART_W, ART_H); for (let y = 0; y < ART_H; y += 16) for (let x = 0; x < ART_W; x += 16) rowsFn(c, x, y); plates(c, plate) }
@@ -99,6 +158,38 @@ export const backgroundOptions = [
       paint(c, (x, y) => (y >= 306 ? gr[Math.min(2, Math.floor((y - 306) / 18))] : null))
       for (let i = 0; i < 70; i++) R(c, ['#ffd23f', '#ff7fa8', '#fff6e8'][i % 3], Math.floor(r() * 118), 308 + Math.floor(r() * 50), 1, 1)
       plates(c, '#fffdf6')
+    } },
+  { id: 'ticket', label: 'Ticket', render: (c) => {
+      R(c, '#4a0912', 0, 0, ART_W, ART_H); R(c, '#fffaf5', 4, 4, 112, 352)
+      ;[82, 158, 234].forEach((y) => { blob(c, 4, y, 4, 4, '#4a0912'); blob(c, 116, y, 4, 4, '#4a0912'); for (let x = 12; x < 108; x += 5) R(c, '#4a0912', x, y, 3, 1) })
+      plates(c, '#e4d8d4', 1)
+      const r = rnd(8); let x = 12; while (x < 66) { const w = 1 + Math.floor(r() * 3); R(c, '#1a1226', x, 310, w, 20); x += w + 1 + Math.floor(r() * 2) }
+      text(c, 'PIXEL BOOTH', 12, 335, '#4a0912')
+      R(c, '#4a0912', 86, 316, 26, 16); R(c, '#4a0912', 92, 312, 8, 4); blob(c, 99, 324, 5, 5, '#fffaf5'); blob(c, 99, 324, 3, 3, '#4a0912'); R(c, '#ff9ec7', 88, 318, 3, 2); sprite(c, HEART, 104, 305, '#d6204a')
+    } },
+  { id: 'dottyblack', label: 'Big Eyes', dark: true, render: (c) => {
+      R(c, '#14101c', 0, 0, ART_W, ART_H)
+      for (let y = 0; y < 40; y++) for (let x = 0; x < ART_W; x++) if (119 - x + y < 34) R(c, (x * 7 + y * 3) % 11 === 0 ? '#e6bcc3' : '#d9a3ac', x, y, 1, 1)
+      for (let y = 300; y < ART_H; y++) for (let x = 0; x < 30; x++) if (x + (359 - y) < 24 + Math.round(3 * Math.sin(y / 3))) R(c, '#d9a3ac', x, y, 1, 1)
+      for (let y = 6; y < 300; y += 13) { blob(c, 5, y, 2, 2, '#ffffff'); blob(c, 115, y + 6, 2, 2, '#ffffff') }
+      for (let x = 16; x < 110; x += 14) { [82, 158, 234].forEach((y) => blob(c, x, y, 1, 1, '#ffffff')) }
+      plates(c, '#f4f1f4', 1); bigEyes(c, 10, 310, 100, 32)
+      sprite(c, HEART, 105, 79, '#c9ced6'); R(c, '#ffffff', 106, 80, 2, 1); R(c, '#8a8f9a', 108, 83, 2, 1)
+    } },
+  retro('retropink', 'Retro Pink', '#ffd0e2', '#ff9ec7', '#7a2a4a', '#ffffff'),
+  retro('retromint', 'Retro Mint', '#c8f3e0', '#7fdcb9', '#1f5a46', '#ffffff'),
+  retro('retroblue', 'Retro Blue', '#cfe8fb', '#8cc6f0', '#1f4a7a', '#ffffff'),
+  shaped('cloudwin', 'Cloud Windows', '#ffe7a6', scallopMask, '#8fd3ff', '#fffdf8', (c) => { [[8, 80], [112, 156], [8, 232], [112, 306]].forEach(([x, y]) => sprite(c, STAR5, x - 2, y, '#fffdf8')) }),
+  shaped('heartwin', 'Heart Windows', '#bfe6ff', heartMask, '#d6204a', '#ff8aa8', (c) => text(c, 'PIXEL BOOTH', 38, 322, '#d6204a')),
+  shaped('bubblewin', 'Speech Bubbles', '#ffc2de', bubbleMask, '#ff7bb8', '#fffdf8', (c) => { for (let y = 6; y < 360; y += 22) sprite(c, HEART, 2, y, '#ff9ec7') }),
+  { id: 'popblue', label: 'Pop Blue', render: (c) => {
+      R(c, '#6ec1f2', 0, 0, ART_W, ART_H); paint(c, (x, y) => ((x * 2 + y) % 90 < 14 ? '#4a9fe0' : null))
+      const r = rnd(17), cols = ['#ffe58f', '#ff9ec7', '#a8efc8', '#ffffff']
+      for (let i = 0; i < 70; i++) R(c, cols[i % 4], Math.floor(r() * 118), Math.floor(r() * 358), 2, 2)
+      for (let i = 0; i < 16; i++) { const x = 2 + Math.floor(r() * 112), y = 2 + Math.floor(r() * 350); R(c, '#ffffff', x, y - 2, 1, 5); R(c, '#ffffff', x - 2, y, 5, 1) }
+      sprite(c, STAR9, 1, 92, '#ffd23f'); sprite(c, STAR9, 110, 168, '#ffd23f'); sprite(c, STAR9, 1, 248, '#ffd23f')
+      plates(c, '#ffffff', 3); plates(c, '#fff6e0', 2)
+      R(c, '#e8403a', 14, 318, 92, 22); R(c, '#ff7a6a', 14, 318, 92, 2); text(c, 'BEST DAY!', 60 - Math.floor(textW('BEST DAY!', 2) / 2), 324, '#ffffff', 2)
     } },
   { id: 'butter', label: 'Butter Girl', dateAlign: 'left', render: (c) => {
       R(c, '#fff0a6', 0, 0, ART_W, ART_H)

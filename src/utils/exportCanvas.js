@@ -30,7 +30,7 @@ export async function composePhotoStrip({
   const ctx = canvas.getContext('2d')
 
   const background = getBackgroundOption(backgroundId)
-  drawBackgroundOnCanvas(ctx, canvas.width, canvas.height, background)
+  if (!background.shaped) drawBackgroundOnCanvas(ctx, canvas.width, canvas.height, background)
 
   const slots = frameLibrary.fourStripSlots
 
@@ -54,6 +54,8 @@ export async function composePhotoStrip({
 
     ctx.drawImage(off, dx, dy)
   }
+
+  if (background.shaped) drawBackgroundOnCanvas(ctx, canvas.width, canvas.height, background)
 
   if (frameLibrary.fourStrip) {
     const frameImg = await loadImage(frameLibrary.fourStrip)

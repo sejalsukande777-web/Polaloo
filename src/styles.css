@@ -272,3 +272,6 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 .pixel-size-row span { margin-right: 4px; }
 .pixel-size-row button { --px: 2px; padding: 4px 10px; background: var(--cream); border: none; font-family: var(--f-display); font-weight: 600; font-size: 14px; box-shadow: var(--ol), var(--bevel); }
 .pixel-size-row button.active { background: var(--pink); }
+
+.frame-overlay { position: absolute; inset: 0; pointer-events: none; image-rendering: pixelated; }
+.preview-date { z-index: 1; }

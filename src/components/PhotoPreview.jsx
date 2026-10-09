@@ -53,12 +53,13 @@ const PhotoPreview = forwardRef(function PhotoPreview({ photos, filters, showDat
       <div
         className="photo-preview-inner"
         style={{
-          ...(frameMissing ? cssBackgroundStyle(bgOption) : { backgroundImage: `url(${frameLibrary.fourStrip})` }),
+          ...(bgOption.shaped ? { backgroundColor: '#fffdf8' } : frameMissing ? cssBackgroundStyle(bgOption) : { backgroundImage: `url(${frameLibrary.fourStrip})` }),
         }}
       >
         {frameLibrary.fourStripSlots.map((slot, i) => (
           <PhotoSlotCanvas key={i} src={photos[i]} filterId={filters[i]} slot={slot} crop={state.photoCrops?.[i] || DEFAULT_CROP} />
         ))}
+        {bgOption.shaped && <div className="frame-overlay" style={cssBackgroundStyle(bgOption)} />}
         {showDate && <div className="preview-date" style={{ color: bgOption.dark ? '#fff6e9' : '#2b1d4a', textAlign: bgOption.dateAlign || 'center', padding: '0 10%' }}>{new Date().toLocaleDateString()}</div>}
       </div>
       <StickerCanvas containerRef={ref} />
