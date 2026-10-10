@@ -4,7 +4,7 @@ import { useBoothDispatch } from '../context/BoothContext.jsx'
 
 const CATEGORY_LABELS = {
   hearts: 'Hearts',
-  stars: 'Stars',
+  stars: 'Space & Stars',
   characters: 'Cute Characters',
   animals: 'Animals',
   flowers: 'Flowers',
@@ -13,7 +13,6 @@ const CATEGORY_LABELS = {
   accessories: 'Accessories',
   seasonal: 'Seasonal',
   special: 'Special',
-  space: 'Space',
   party: 'Party',
   summer: 'Summer',
   retro: 'Retro',
