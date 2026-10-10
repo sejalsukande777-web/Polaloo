@@ -7,7 +7,7 @@ const TITLE = ['PIXEL PHOTO', 'BOOTH']
 // Scenery placed in "world" coordinates (% of the stage, same box as the background art)
 const SCENERY = [
   ['star-gold', 'top: 9%; left: 12%; width: 8%', 'twinkle'], ['sparkle-burst', 'top: 24%; right: 9%; width: 9%', 'twinkle d2'],
-  ['heart-red', 'top: 41%; left: 6%; width: 8%', 'bob'],
+  ['heart-pink', 'top: 41%; left: 6%; width: 8%', 'bob'],
   ['cat', 'bottom: 7%; left: 5%; width: 13%', 'hop'], ['bunny', 'bottom: 11%; left: 21%; width: 13%', 'hop d2'],
   ['chick', 'bottom: 11%; right: 21%; width: 13%', 'hop d3'], ['frog', 'bottom: 7%; right: 5%; width: 13%', 'hop d4'],
 ]
