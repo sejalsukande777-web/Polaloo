@@ -6,12 +6,18 @@ const CATEGORY_LABELS = {
   hearts: 'Hearts',
   stars: 'Stars',
   characters: 'Cute Characters',
+  animals: 'Animals',
   flowers: 'Flowers',
   bows: 'Bows',
   food: 'Food',
   accessories: 'Accessories',
   seasonal: 'Seasonal',
   special: 'Special',
+  space: 'Space',
+  party: 'Party',
+  summer: 'Summer',
+  retro: 'Retro',
+  nature: 'Nature',
 }
 
 let stickerCounter = 0
