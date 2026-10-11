@@ -17,6 +17,9 @@ const CATEGORY_LABELS = {
   summer: 'Summer',
   retro: 'Retro',
   nature: 'Nature',
+  fantasy: 'Fantasy',
+  stationery: 'Stationery',
+  cozy: 'Cozy',
 }
 
 let stickerCounter = 0
