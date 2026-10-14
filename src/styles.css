@@ -122,7 +122,7 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 .door-glow { position: absolute; left: 12%; top: 40%; width: 76%; aspect-ratio: 1; opacity: 0; z-index: 1;
   background: radial-gradient(circle, rgba(255, 244, 190, 0.95) 0 30%, rgba(255, 244, 190, 0.5) 30% 55%, rgba(255, 244, 190, 0) 55%); }
 .door-glow.on { opacity: 1; animation: pulse 0.6s steps(2) infinite; }
-.knock { position: absolute; left: 0; right: 0; top: 43%; margin: 0; font-size: 22px; color: #fff; text-shadow: 2px 2px 0 var(--navy), -2px 2px 0 var(--navy), 2px -2px 0 var(--navy), -2px -2px 0 var(--navy); animation: blink 1.2s steps(1) infinite; }
+.knock { position: absolute; left: 50%; top: 43%; transform: translateX(-50%); width: max-content; max-width: 92%; margin: 0; padding: 4px 12px; background: var(--cream); color: var(--navy); font-family: var(--f-display); font-weight: 600; font-size: 17px; box-shadow: var(--ol), var(--bevel); animation: blink 1.4s steps(1) infinite; }
 .title { font-family: var(--f-title); font-weight: normal; font-size: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 6px; }
 .title-row { display: flex; gap: 2px; }
 .title .ch { display: inline-block; color: var(--c, var(--pink)); animation: wob 1.6s steps(2) infinite;
@@ -199,8 +199,8 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 .sticker-handle.resize { right: -6px; bottom: -6px; cursor: nwse-resize; }
 .sticker-handle.rotate { left: 50%; top: -16px; transform: translateX(-50%); cursor: grab; border-radius: 0; }
 
-.editor-tabs { display: flex; gap: 8px; overflow-x: auto; padding: var(--px) var(--px) calc(var(--px) * 3); }
-.editor-tabs button { flex: 1; --px: 3px; min-width: 48px; padding: 10px 2px; background: var(--cream); border: none; font-family: var(--f-display); font-size: 16px; font-weight: 600; white-space: nowrap;
+.editor-tabs { display: flex; gap: 6px; overflow-x: auto; padding: var(--px) var(--px) calc(var(--px) * 3); }
+.editor-tabs button { flex: 1; --px: 3px; min-width: 48px; padding: 10px 1px; background: var(--cream); border: none; font-family: var(--f-display); font-size: clamp(11px, 3.3vw, 16px); font-weight: 600; letter-spacing: -0.3px; white-space: nowrap;
   box-shadow: var(--ol), var(--bevel), var(--slab); }
 .editor-tabs button.active { background: var(--pink); transform: translateY(3px); box-shadow: var(--ol), var(--bevel); }
 
