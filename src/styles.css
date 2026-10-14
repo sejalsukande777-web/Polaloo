@@ -64,7 +64,7 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 /* ---------- shell ---------- */
 /* One continuous pixel world behind every screen; bottom-anchored so the
    door/scenery on the home screen lines up with the art exactly. */
-.world-layer { position: fixed; z-index: -1; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100vw, 520px); height: 100%;
+.world-layer { position: fixed; z-index: -1; bottom: 0; left: 50%; transform: translateX(-50%); width: calc(108 * var(--art, 3.4px)); height: 100%;
   background: #1c5aa8 url('./assets/backgrounds/world.png') bottom center / 100% auto no-repeat; image-rendering: pixelated; }
 .app-root {
   min-height: 100%;
@@ -110,7 +110,7 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 /* ---------- home: the door ---------- */
 .home-screen { position: relative; align-items: center; text-align: center; padding-top: 28px; }
 .home-screen > .title { position: relative; z-index: 3; }
-.stage { position: fixed; z-index: 1; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100vw, 520px); aspect-ratio: 108 / 232; pointer-events: none; }
+.stage { position: fixed; z-index: 1; bottom: 0; left: 50%; transform: translateX(-50%); width: calc(108 * var(--art, 3.4px)); aspect-ratio: 108 / 232; pointer-events: none; }
 .sprite { position: absolute; image-rendering: pixelated; }
 .sprite.twinkle { animation: twinkle 1.2s steps(1) infinite; } .sprite.bob { animation: bob 1s steps(2) infinite; }
 .sprite.hop { animation: hop 0.9s steps(2) infinite; }
@@ -200,7 +200,7 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 .sticker-handle.rotate { left: 50%; top: -16px; transform: translateX(-50%); cursor: grab; border-radius: 0; }
 
 .editor-tabs { display: flex; gap: 8px; overflow-x: auto; padding: var(--px) var(--px) calc(var(--px) * 3); }
-.editor-tabs button { flex: 1; --px: 3px; min-width: 56px; padding: 10px 2px; background: var(--cream); border: none; font-family: var(--f-display); font-size: 16px; font-weight: 600; white-space: nowrap;
+.editor-tabs button { flex: 1; --px: 3px; min-width: 48px; padding: 10px 2px; background: var(--cream); border: none; font-family: var(--f-display); font-size: 16px; font-weight: 600; white-space: nowrap;
   box-shadow: var(--ol), var(--bevel), var(--slab); }
 .editor-tabs button.active { background: var(--pink); transform: translateY(3px); box-shadow: var(--ol), var(--bevel); }
 
@@ -275,3 +275,7 @@ h3 { font-size: 18px; margin-bottom: 8px; }
 
 .frame-overlay { position: absolute; inset: 0; pointer-events: none; image-rendering: pixelated; }
 .preview-date { z-index: 1; }
+
+.face-status { font-size: 20px; margin: 10px 0 0; }
+.face-clear { --px: 2px; margin-top: 10px; padding: 8px 12px; background: var(--cream); border: none; font-family: var(--f-display); font-weight: 600; font-size: 14px; box-shadow: var(--ol), var(--bevel); }
+.face-panel .sticker-thumb:disabled { opacity: 0.5; }

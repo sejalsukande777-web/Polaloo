@@ -5,6 +5,7 @@ import PhotoPreview from './PhotoPreview.jsx'
 import PhotoAdjustPanel from './PhotoAdjustPanel.jsx'
 import FilterPanel from './FilterPanel.jsx'
 import StickerPanel from './StickerPanel.jsx'
+import FacePanel from './FacePanel.jsx'
 import BackgroundPanel from './BackgroundPanel.jsx'
 import ExportPanel from './ExportPanel.jsx'
 import PixelButton from './PixelButton.jsx'
@@ -41,6 +42,7 @@ export default function PhotoStripEditor() {
       <div className="editor-tabs">
         <button className={activeTab === 'adjust' ? 'active' : ''} onClick={() => setActiveTab('adjust')}>Crop</button>
         <button className={activeTab === 'filters' ? 'active' : ''} onClick={() => setActiveTab('filters')}>Filter</button>
+        <button className={activeTab === 'face' ? 'active' : ''} onClick={() => setActiveTab('face')}>Face</button>
         <button className={activeTab === 'stickers' ? 'active' : ''} onClick={() => setActiveTab('stickers')}>Sticker</button>
         <button className={activeTab === 'background' ? 'active' : ''} onClick={() => setActiveTab('background')}>BG</button>
         <button className={activeTab === 'export' ? 'active' : ''} onClick={() => setActiveTab('export')}>Save</button>
@@ -62,6 +64,7 @@ export default function PhotoStripEditor() {
         </>
       )}
 
+      {activeTab === 'face' && <FacePanel />}
       {activeTab === 'stickers' && <StickerPanel />}
       {activeTab === 'background' && <BackgroundPanel />}
       {activeTab === 'export' && <ExportPanel />}

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BoothProvider, useBoothState } from './context/BoothContext.jsx'
 import HomeScreen from './components/HomeScreen.jsx'
 import PhotoBooth from './components/PhotoBooth.jsx'
@@ -22,7 +23,23 @@ function Router() {
   }
 }
 
+// Pixel-perfect scaling: every pixel of the 108-wide world art becomes a whole number of screen pixels,
+// so the pixels are all the same size (fractional scaling made them uneven and glitchy-looking on phones).
+function useArtScale() {
+  useEffect(() => {
+    const set = () => {
+      const dpr = window.devicePixelRatio || 1
+      const n = Math.ceil((Math.min(window.innerWidth, 520) * dpr) / 108)
+      document.documentElement.style.setProperty('--art', `${n / dpr}px`)
+    }
+    set()
+    window.addEventListener('resize', set)
+    return () => window.removeEventListener('resize', set)
+  }, [])
+}
+
 export default function App() {
+  useArtScale()
   return (
     <BoothProvider>
       <div className="world-layer" />
